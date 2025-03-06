@@ -1,7 +1,7 @@
-from flask import Flask, request, jsonify
 import psycopg2
+from flask import request, jsonify
 
-app = Flask(__name__)
+from src.company_directory.route import main
 
 conn = psycopg2.connect(
     dbname="postgres",
@@ -11,7 +11,7 @@ conn = psycopg2.connect(
 )
 
 
-@app.route("/show_employee_table")
+@main.route("/show_employee_table")
 def welcome():
     cursor = conn.cursor()
 
@@ -24,7 +24,7 @@ def welcome():
     return record
 
 
-@app.route("/create/employee", methods=['POST'])
+@main.route("/create/employee", methods=['POST'])
 def create_employee():
     cursor = conn.cursor()
     data = request.get_json()
@@ -35,6 +35,3 @@ def create_employee():
     conn.commit()
     cursor.close()
     return jsonify({"message": "employee created successfully!"}), 201
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
