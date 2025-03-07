@@ -1,6 +1,6 @@
-from flask import Flask
+from flask import Flask, request
 import psycopg2
-
+app = Flask(__name__)
 conn = psycopg2.connect(
     dbname="postgres",
     user="postgres",
