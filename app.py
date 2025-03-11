@@ -32,15 +32,25 @@ def employee_profile(id):
 
     # Fetch all rows from database
     record = cursor.fetchall()
+    columns = cursor.description
+    print(columns)
+    for i in columns:
+        print(i[0])
+    print(type(record))
     return record
 
+
+def validate_create_employee_input_data(data):
+    pass
 
 @app.route("/create/employee", methods=['POST'])
 def create_employee():
     cursor = conn.cursor()
     data = request.get_json()
-    insert_query = "insert into company_directory.employee_data (employee_id, manager_id, employee_name, manager_name, salary) values (%s, %s, %s, %s, %s)"
-    values = (data['employee_id'], data['manager_id'], data['employee_name'], data['manager_name'], data['salary'])
+    validate_create_employee_input_data(data)
+
+    insert_query = "insert into company_directory.employee_data (employee_name, reports_to, salary) values (%s, %s, %s)"
+    values = (data['employee_name'], data['reports_to'], data['salary'])
 
     cursor.execute(insert_query, values)
     conn.commit()
@@ -52,18 +62,16 @@ def create_employee():
 def create_employee_batch():
     cursor = conn.cursor()
     data = request.get_json()
-    insert_query = "insert into company_directory.employee_data (employee_id, manager_id, employee_name, manager_name, salary) values (%s, %s, %s, %s, %s)"
+    insert_query = "insert into company_directory.employee_data (employee_name, reports_to, salary) values (%s, %s, %s)"
     values_list = []
-    created_employee_ids = []
     for i in data:
-        values_list.append((i['employee_id'], i['manager_id'], i['employee_name'], i['manager_name'], i['salary']))
-        created_employee_ids.append(i['employee_id'])
+        values_list.append((i['employee_name'], i['reports_to'], i['salary']))
     cursor.executemany(insert_query, values_list)
     conn.commit()
     cursor.close()
 
     return jsonify(
-        {"message": "employee_batch created successfully!", "newly created employee id's": created_employee_ids}), 201
+        {"message": "employee_batch created successfully!"}), 201
 
 
 @app.route("/delete/<int:id>", methods=['DELETE'])
@@ -99,7 +107,7 @@ def update_employee():
     return jsonify({"message": "employee has been updated!"}), 200
 
 @app.route("/employee")
-def employee_aggrigation():
+def employee_aggregation():
     cursor = conn.cursor()
     data = request.args.to_dict()
     col_name = next(iter(data))
