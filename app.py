@@ -32,12 +32,15 @@ def employee_profile(id):
 
     # Fetch all rows from database
     record = cursor.fetchall()
-    columns = cursor.description
+    record = record[0]
+    columns_data = cursor.description
+    columns = []
+    for col in columns_data:
+        columns.append(col[0])
     print(columns)
-    for i in columns:
-        print(i[0])
-    print(type(record))
-    return record
+    print(record)
+    result = jsonify(dict(zip(columns, record)))
+    return result, 200
 
 
 def validate_create_employee_input_data(data):
