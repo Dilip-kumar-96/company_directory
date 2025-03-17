@@ -10,6 +10,27 @@ conn = psycopg2.connect(
     host="localhost"
 )
 
+def validate_create_employee_input_data(data): #data = {"reports_to" : 100000,"salary" : 500000}
+
+    if isinstance(data, list):
+        for i in data:
+            if len(i) != 3:
+                return True
+    else:
+        dict_len = len(data)
+        if dict_len != 3:
+            return True
+def employee_check(id):
+    cursor = conn.cursor()
+    cursor.execute("SELECT * from company_directory.employee_data where employee_id = %s;", (id,))
+    record = cursor.fetchall()
+    conn.commit()
+    cursor.close()
+    if len(record) == 0:
+        return True
+    else:
+        return False
+
 
 @app.route("/show_employee_table")
 def welcome():
@@ -20,12 +41,16 @@ def welcome():
     # Fetch all rows from database
     record = cursor.fetchall()
 
+
     print("Data from Database:- ", record)
     return record
 
 
 @app.route("/employee/<int:id>")
 def employee_profile(id):
+    employee_availability = employee_check(id)
+    if employee_availability:
+        return jsonify({"message": "employee unavailable"}), 404
     cursor = conn.cursor()
 
     cursor.execute("SELECT * from company_directory.employee_data where employee_id = %s;", (id,))
@@ -37,25 +62,27 @@ def employee_profile(id):
     columns = []
     for col in columns_data:
         columns.append(col[0])
-    print(columns)
-    print(record)
     result = jsonify(dict(zip(columns, record)))
     return result, 200
 
-
-def validate_create_employee_input_data(data):
-    pass
 
 @app.route("/create/employee", methods=['POST'])
 def create_employee():
     cursor = conn.cursor()
     data = request.get_json()
-    validate_create_employee_input_data(data)
+    is_valid = validate_create_employee_input_data(data)
+    if is_valid:
+        return jsonify({"message": "make sure the input has 3 values"})
+
 
     insert_query = "insert into company_directory.employee_data (employee_name, reports_to, salary) values (%s, %s, %s)"
     values = (data['employee_name'], data['reports_to'], data['salary'])
-
-    cursor.execute(insert_query, values)
+    try:
+        cursor.execute(insert_query, values)
+    except psycopg2.errors.InvalidTextRepresentation:
+        conn.commit() #Once the error has handled it doesn't handle the next time unless the server is restarted.
+                       #the transaction will be pending and throws error next. The transaction needs to either rolled back or changes need to be commited.
+        return jsonify({"message": "invalid data type"})
     conn.commit()
     cursor.close()
     return jsonify({"message": "employee created successfully!"}), 201
@@ -65,11 +92,21 @@ def create_employee():
 def create_employee_batch():
     cursor = conn.cursor()
     data = request.get_json()
+    is_valid = validate_create_employee_input_data(data)
+    if is_valid:
+        return jsonify({"message": "make sure the input has 3 values"})
+
     insert_query = "insert into company_directory.employee_data (employee_name, reports_to, salary) values (%s, %s, %s)"
     values_list = []
     for i in data:
         values_list.append((i['employee_name'], i['reports_to'], i['salary']))
-    cursor.executemany(insert_query, values_list)
+        try:
+            cursor.executemany(insert_query, values_list)
+        except psycopg2.errors.InvalidTextRepresentation:
+            conn.commit()  # Once the error has handled it doesn't handle the next time unless the server is restarted.
+            # the transaction will be pending and throws error next. The transaction needs to either rolled back or changes need to be commited.
+            return jsonify({"message": "invalid data type"})
+
     conn.commit()
     cursor.close()
 
@@ -79,8 +116,10 @@ def create_employee_batch():
 
 @app.route("/delete/<int:id>", methods=['DELETE'])
 def delete_employee(id):
+    employee_availability = employee_check(id)
+    if employee_availability:
+        return jsonify({"message": "employee unavailable"}), 404
     cursor = conn.cursor()
-
     cursor.execute("delete from company_directory.employee_data where employee_id = %s", (id,))
 
     conn.commit()
