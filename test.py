@@ -64,3 +64,7 @@
 # bonus_results = calculate_bonus(employee_data, bonus_percentage)
 # print(bonus_results)
 
+try:
+    print(5/0)
+except:
+    return ("division error")
