@@ -1,24 +1,70 @@
-from flask import Flask, request
-import psycopg2
-app = Flask(__name__)
-conn = psycopg2.connect(
-    dbname="postgres",
-    user="postgres",
-    password="dilip1231",
-    host="localhost"
-)
-@app.route("/create/employee_batch", methods=['POST']) #Send json data in the form of list
-def create_employee():
-    cursor = conn.cursor()
-    data = request.get_json()
-    insert_query = "insert into company_directory.employee_data (employee_id, manager_id, employee_name, manager_name, salary) values (%s, %s, %s, %s, %s)"
-    values_list = []
-    for i in data:
-        values_list.append((i['employee_id'], i['manager_id'], i['employee_name'], i['manager_name'], i['salary']))
+# # #elif program to check temperature.
+# # a = int(input("enter temperature in celsius : "))
+# # if a < 0:
+# #     print("freezing")
+# # elif a > -1 and a < 15:
+# #     print("cold")
+# # else:
+# #     print("hot")
+#
+# ##########
+# #program to print odd numbers from m - n. output should be returned from a function
+# # def check_oddnumbers(start_number, end_number):
+# #     odd_numbers = []
+# #     for i in range(start_number, end_number+1):
+# #         if i % 2 != 0:
+# #             odd_numbers += [i]
+# #     return odd_numbers
+# # start_number = int(input())
+# # end_number = int(input())
+# # odd_numbers = check_oddnumbers(start_number, end_number)
+# # print(odd_numbers)
+#
+# #######################
+# Write a function calculate_bonus(employee_data, bonus_percentage) that takes:
+# employee_data: A list of dictionaries, where each dictionary contains:
+# "name": (string) Employee's name
+# "salary": (float) Employee's salary
+# "performance": (string) Employee's performance rating, which can be "excellent", "good", or "average"
+# bonus_percentage: A dictionary that maps performance ratings to bonus percentages.
+# example input: employees = [
+#     {"name": "Alice", "salary": 50000, "performance": "excellent"},
+#     {"name": "Bob", "salary": 60000, "performance": "good"},
+#     {"name": "Charlie", "salary": 45000, "performance": "average"},
+# ]
+# bonus_percentage = {
+#     "excellent": 20,
+#     "good": 10,
+#     "average": 5
+# }
+# Requirements:
+# The function should calculate the bonus amount for each employee based on their performance.
+# The function should return a new list of dictionaries, where each dictionary contains:
+# expected output : [
+#     {"name": "Alice", "salary": 50000, "bonus": 10000.0},
+#     {"name": "Bob", "salary": 60000, "bonus": 6000.0},
+#     {"name": "Charlie", "salary": 45000, "bonus": 2250.0},
+# ]
+# import json # to take dictionary inputs
+# def calculate_bonus(employee_data, bonus_percentage):
+#     result = []
+#     for employee in employee_data:
+#         performance = employee['performance']
+#         bonus = employee['salary']/bonus_percentage[performance]
+#         del employee['performance']
+#         employee['bonus'] = bonus
+#         result.append(employee)
+#     return result
+#
+#
+# employee_data = input()
+# employee_data = json.loads(employee_data)
+# bonus_percentage = input()
+# bonus_percentage = json.loads(bonus_percentage)
+# bonus_results = calculate_bonus(employee_data, bonus_percentage)
+# print(bonus_results)
 
-    cursor.executemany(insert_query, values_list)
-    conn.commit()
-    cursor.close()
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+try:
+    print(5/0)
+except:
+    return ("division error")
