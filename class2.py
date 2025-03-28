@@ -10,6 +10,7 @@ class product:
         self.ratings = ratings
         self.you_saved = price - deal_price
 
+
     def display_items(self):
         print(f"Product: {self.name}")
         print(f"Price: {self.price}")
