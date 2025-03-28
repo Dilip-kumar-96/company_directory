@@ -1,41 +1,42 @@
 from flask import Flask
-from services import welcome, employee_profile, update_employee, create_employee, create_employee_batch, employee_aggregation, delete_employee
+from services import employee_services
 
 app = Flask(__name__)
+emp_serve = employee_services()
 
 @app.route("/show_employee_table")
 def main_employee_table():
-    return welcome()
+    return emp_serve.welcome()
 
 
 @app.route("/employee/<int:id>")
 def main_employee_profile(id):
-    return employee_profile(id)
+    return emp_serve.employee_profile(id)
 
 
 @app.route("/create/employee", methods=['POST'])
 def main_create_employee():
-    return create_employee()
+    return emp_serve.create_employee()
 
 
 @app.route("/create/employee_batch", methods=['POST'])  # Send json data in the form of list
 def main_create_employee_batch():
-    return create_employee_batch
+    return emp_serve.create_employee_batch()
 
 
 @app.route("/delete/<int:id>", methods=['DELETE'])
 def main_delete_employee(id):
-    return delete_employee(id)
+    return emp_serve.delete_employee(id)
 
 
 @app.route("/update/employee", methods=['POST'])
 def main_update_employee():
-    return update_employee()
+    return emp_serve.update_employee()
 
 
 @app.route("/employee")
 def main_employee_aggregation():
-    return employee_aggregation()
+    return emp_serve.employee_aggregation()
 
 
 if __name__ == '__main__':

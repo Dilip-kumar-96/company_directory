@@ -99,6 +99,10 @@ select * from company_directory.employee_data
 	on company_directory.employee_review.employee_id = company_directory.employee_data.employee_id;
 
 select *
-	from company_directory.employee_data
-	cross join company_directory.employee_review; -- Cross join combines each row from table 1 with all the rows from table 2. It gives all possible combinations--
+	from company_directory.employee_data ed
+	cross join company_directory.employee_review er
+	order by ed.employee_name; -- Cross join combines each row from table 1 with all the rows from table 2. It gives all possible combinations--
 
+set schema 'company_directory'; 
+
+select * from employee_data ed;
